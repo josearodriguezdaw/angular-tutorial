@@ -292,23 +292,23 @@ Concretamente, el objetivo es desarrollar una aplicación web que nos permita ge
 
 `src/app/componentes/` → carpeta que contendrá todos los componentes creados.
 
-`navbar/` → componente que contendrá la barra de navegación de nuestra aplicación.
+- `navbar/` → componente que contendrá la barra de navegación de nuestra aplicación.
 
-`footer/` → componente que contendrá el footer de nuestra aplicación.
+- `footer/` → componente que contendrá el footer de nuestra aplicación.
 
-`auth/` → carpeta que contendrá los componentes de autenticación y registro.
+- `auth/` → carpeta que contendrá los componentes de autenticación y registro.
 
-`sigin/` → componente de registro.
+  - `sigin/` → componente de registro.
 
-`login/` → componente para iniciar sesión.
+  - `login/` → componente para iniciar sesión.
 
-`task/` → carpeta que contendrá los componentes relacionados con la gestión de tareas.
+- `task/` → carpeta que contendrá los componentes relacionados con la gestión de tareas.
 
-`tasklist/` → componente que mostrará todas las tareas
+  - `tasklist/` → componente que mostrará todas las tareas
 
-`taskform/`→ componente para crear o editar una tarea.
+  - `taskform/`→ componente para crear o editar una tarea.
 
-`taskresume/` → componente que mostrará de manera resumida una tarea.
+  - `taskresume/` → componente que mostrará de manera resumida una tarea.
 
 Modifica las plantillas de los componentes `navbar` y `footer` para añadir un menú y un pie de página de bootstrap, e importa dichos componentes en el componente principal `app-component.`
 
