@@ -113,12 +113,14 @@ La configuración de cada una de las filas y las columnas de la aplicación la r
 
 ## 4.2. Principios de Bootstrap.
 
-1. Contenedores: 
+1. Contenedores : 
     - Los contenedores .container o .container-fluid es el elemento principal dónde vamos a introducir las filas y las columnas.
     - `.container` tiene un ancho fijo que se adapta a diferentes tamaños de pantalla, mientras que `.container-fluid` se extiende a todo el ancho de la pantalla.
-2. Filas:
-    - Dentro de un contenedor, se usa la clase `.row` para crear una fila. Las filas dividen el contenido horizontalmente y organizan las columnas dentro de ellas.
-3. Columnas
+
+2. Filas: 
+
+- Dentro de un contenedor, se usa la clase `.row` para crear una fila. Las filas dividen el contenido horizontalmente y organizan las columnas dentro de ellas.
+1. Columnas
     - Dentro de cada fila, se agregan columnas usando clases como `.col`, `.col-md-6`, `.col-lg-4`, etc.
     - La rejilla de Bootstrap se basa en un sistema de 12 columnas, así que se pueden combinar diferentes tamaños para lograr distribuciones variadas (por ejemplo, `.col-6` ocupa 6 de las 12 columnas, es decir, la mitad del ancho).
     - Bootstrap incluye clases específicas para diferentes tamaños de pantalla: `.col-sm-` para móviles, `.col-md-` para tabletas, `.col-lg-` para pantallas grandes y `.col-xl-` para pantallas extra grandes.
@@ -132,6 +134,7 @@ Para instalar el módulo de Boostrap desde node tenemos que lanzar el siguiente 
 
 ```tsx
 npm install bootstrap@5.3.3
+npm install bootstrap-icons
 ```
 
 Tener en cuenta que mediante `@5.3.3` estamos definiendo la versión que deseamos instalar. También podemos lanzar este mismo comando sin usar `@5.3.3` y se instalará la última versión.
@@ -147,12 +150,15 @@ Una vez instalado el módulo de node, tenemos que indicarle a Angular dónde se 
 ```json
 "styles": [
   "src/styles.css",
-  **"node_modules/bootstrap/dist/css/bootstrap.min.css"**
+  **"node_modules/bootstrap/dist/css/bootstrap.min.css",
+  "node_modules/bootstrap-icons/font/bootstrap-icons.min.css"**
 ],
 "scripts": [
-  **"node_modules/bootstrap/dist/css/bootstrap.min.js"**
+  **"node_modules/bootstrap/dist/js/bootstrap.min.js"**
 ]
 ```
+
+`<i class="bi bi-airplane-engines"></i>`
 
 Ya tendríamos Boostrap listo para ser usado en nuestro proyecto Angular.
 
@@ -171,6 +177,10 @@ Ya tendríamos Boostrap listo para ser usado en nuestro proyecto Angular.
 En este ejemplo las columnas se dividen en partes iguales de 4 columnas cada una (3x4=12 columnas)
 
 En dispositivos medianos y más grandes estas columnas se mostrarán en una sola fila. En dispositivos más pequeños se ajustarán automáticamente en filas de una sola columna.
+
+## Ejercicio 1: Instalación de Bootstrap.
+
+Realiza la instalación de Bootstrap y Bootstrap Icons en tu proyecto de Angular.
 
 
 # 5. Interpolación.
@@ -224,9 +234,87 @@ Al ejecutar este código, el navegador renderizará así:
     ```
     
 
-# 6. Sintaxis de la plantilla.
+# 6. Componentes.
 
-En angular una plantilla es un fragmento de HTML. Sin embargo, dentro de esta se puede usar una sintaxis especial que permitirá añadirle un comportamiento dinámico a nuestra plantilla. Para emplear esta sintaxis especial se usará el caracter `@` .
+En Angular un componente es una de las piezas fundamentales de la aplicación. Los componentes son bloques de funcionalidades independientes y reutilizables que controlan una parte de la interfaz gráfica de usuario. Como hemos mencionado anteriormente, cada componente tiene su controlador, su plantilla HTML, su hoja de estilos y su archivo de pruebas.
+
+Toda aplicación en Angular cuenta con un componente principal AppComponent, desde donde arranca la aplicación. Sin embargo, se pueden añadir nuevos componentes.
+
+## 6.1. Creación e importación de componentes.
+
+La forma más sencilla que tenemos de crear un componente es usando la consola de Angular, mediante el siguiente comando:
+
+```html
+ng generate component components/navbar
+```
+
+En la anterior línea hemos creado un componente llamado navbar dentro del contenedor componets/ para mejorar su organización.
+
+Todo componente cuenta con un selector que nos permitirá utilizarlo dentro de otro componente, por ejemplo, dentro del componente principal. El selector básicamente lo que establece es el nombre de la etiqueta que se deberá usar para importar dicho componente.
+
+Por ejemplo, si accedemos a la clase del componente que hemos creado podremos observar que dentro del decorador @component existe una propiedad llamada selector. Esta es la propiedad que define el nombre de la etiqueta.
+
+```tsx
+import { Component } from '@angular/core';
+@Component({
+  selector: 'app-navbar',
+  standalone: true,
+  imports: [],
+  templateUrl: './navbar.component.html',
+  styleUrl: './navbar.component.css'
+})
+export class NavbarComponent {
+}
+```
+
+Para poder usar este componente en nuestro proyecto primeramente, será necesario añadirlo a la propiedad `imports`  de la clase AppComponent y posteriormente lo importaremos dentro del documento HTML empleando el nombre de su etiqueta.
+
+```tsx
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet,NavbarComponent],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css',
+  
+})
+```
+
+```html
+app-navbar></app-navbar>
+```
+
+### EJERCICIO 2. Creación componentes app.
+
+El objetivo del presente ejercicio es comenzar a crear los diferentes componentes que formarán parte del proyecto que vamos a ir desarrollando durante los siguientes ejercicios y que nos servirá para poner en práctica todos los contenidos que vamos adquiriendo.
+
+Concretamente, el objetivo es desarrollar una aplicación web que nos permita gestionar tareas. Para ello, vamos a crear la siguiente estructura de componentes:
+
+`src/app/componentes/` → carpeta que contendrá todos los componentes creados.
+
+`navbar/` → componente que contendrá la barra de navegación de nuestra aplicación.
+
+`footer/` → componente que contendrá el footer de nuestra aplicación.
+
+`auth/` → carpeta que contendrá los componentes de autenticación y registro.
+
+`sigin/` → componente de registro.
+
+`login/` → componente para iniciar sesión.
+
+`task/` → carpeta que contendrá los componentes relacionados con la gestión de tareas.
+
+`tasklist/` → componente que mostrará todas las tareas
+
+`taskform/`→ componente para crear o editar una tarea.
+
+`taskresume/` → componente que mostrará de manera resumida una tarea.
+
+Modifica las plantillas de los componentes `navbar` y `footer` para añadir un menú y un pie de página de bootstrap, e importa dichos componentes en el componente principal `app-component.`
+
+# 7. Sintaxis de la plantilla.
+
+En angular una plantilla es un fragmento de HTML. Sin embargo, dentro de esta se puede usar una sintaxis especial que permitirá añadirle un comportamiento dinámico a nuestra plantilla. Para emplear esta sintaxis especial se usará el carácter `@` .
 
 Dado el contenido del controlador:
 
@@ -289,7 +377,165 @@ Dado el contenido del controlador:
   }
 ```
 
-# 7. Event Binding.
+# 8. Directivas.
+
+Las directivas son instrucciones que le indican al framework cómo renderizar los diferentes elementos. Esto permitirá modificar la estructura del DOM: aplicar estilos, añadir comportamientos, realizar operaciones condicionales, etc.
+
+Las directivas se dividen en tres categorías:
+
+- Directivas Estructurales.
+- Directivas de Atributo.
+- Directivas Personalizadas.
+
+Para poder emplear las directivas es necesario importar el módulo `CommonModule` en la clase del componente.
+
+## 8.1. Directivas estructurales:
+
+Son aquellas que cambian la estructura del DOM, es decir, añaden o eliminan elementos según una condición o una lógica determinada. Estas directivas se identifican por el prefijo `*` que indica que Angular debe manejar el DOM de forma especial.
+
+Ejemplos de directivas estructurales:
+
+- *ngIf: renderiza un elemento del DOM si se cumple una determinada expresión booleana.
+
+```html
+<p *ngIf="esMayorEdad">La persona es mayor de Edad</p>
+```
+
+- `*ngFor:` renderiza un conjunto de elementos de forma repetida en función de una colección de objetos.
+
+```html
+<li *ngFor="let item of items">{{ item }}</li>
+```
+
+- **`*ngSwitch`, `*ngSwitchCase`, y `*ngSwitchDefault`**: Permiten una lógica de control similar a `switch`, donde se evalúa una expresión y se muestra un bloque específico.
+
+```html
+<div [ngSwitch]="valor">
+<p *ngSwitchCase="opcion1">Caso 1</p>
+<p *ngSwitchCase="opcion2">Caso 2</p>
+<p *ngSwitchDefault>Caso predeterminado</p>
+</div>
+```
+
+## 8.2. Directivas de atributo.
+
+Son aquellas que modifican la apariencia o el comportamiento de un elemento en el DOM. A diferencia de las directivas estructurales no cambian la estructura del DOM.
+
+Ejemplos de directivas de atributo:
+
+- **`ngClass`**: Añade o elimina clases CSS en un elemento de acuerdo con una expresión.
+
+```html
+<p [ngClass]="{'activo': esActivo, 'inactivo': !esActivo}">Texto con clases dinámicas.</p>
+```
+
+- **`ngStyle`**: Cambia estilos en línea de un elemento basados en una expresión.
+
+```html
+<p [ngStyle]="{'color': colorTexto}">Texto con estilo dinámico.</p>
+```
+
+- **`[hidden]`**: Muestra u oculta un elemento (es similar a `*ngIf`, pero mantiene el elemento en el DOM).
+
+```html
+<p [hidden]="ocultar">Este texto puede ocultarse.</p>
+```
+
+## 8.3. Directivas personalizadas.
+
+Angular permite definir directivas personalizadas. Esto es útil para cuando se quiere implementar un comportamiento que será reutilizado en muchos componentes de nuestro proyecto.
+
+A continuación se muestra cómo implementar una directiva que resaltará el texto de un elemento al hacer mouse hover y volverá a su estado normal con el mouse out.
+
+1. Creamos la directiva usando AngularCLI
+
+```powershell
+ng generate directive directives/resaltar
+```
+
+1. Implementamos la funcionalidad de la clase que contiene la lógica de la directiva:
+
+```tsx
+import { Directive, ElementRef, HostListener, Input } from '@angular/core';
+
+@Directive({
+  selector: '[appResaltar]',
+  standalone: true
+})
+export class ResaltarDirective {
+  constructor(private ele: ElementRef) {
+  }
+
+  @HostListener('mouseenter') onMouseEnter() {
+    this.ele.nativeElement.style.color ='blue';
+  }
+  
+  @HostListener('mouseout') onMouseOut() {
+    this.ele.nativeElement.style.color ='red';
+  }
+}
+```
+
+1. Importamos la directiva en el componente:
+
+```powershell
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet,ResaltarDirective],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css',
+  
+})
+```
+
+## Ejercicio 3: Funcionalidad componente TaskList.
+
+El objetivo del presente ejercicio consiste en implementar la funcionalidad básica del componente tasklist, cuyo propósito es mostrar una tabla con las diferentes tareas que existen creadas en el sistema.
+
+Para poder trabajar con las tareas, lo primero que es necesario realizar es modelar un objeto `Task`que lo represente. Para ello, crea un archivo llamado `task.model.ts` en el directorio `src/app/models`dónde se implemente una clase llamada `Task` que contenga las siguientes propiedades:
+
+- `id`
+- `nombre`
+- `descripción`
+- `prioridad` que puede ser, Baja, Media, Alta
+- `estado`que puede ser: Completada, En progreso y Pendiente.
+- `fecha de creación`
+- `fecha de expiración`
+- `isDelete`
+
+Inicializa, empleando el método `ngOnInit`, un listado de tareas tomando como referencia el objeto anteriormente definido.
+
+Modifica el código HTML del componente `TaskList` y añade una tabla de bootstrap dónde se deberá mostrar las siguientes propiedades de cada tarea: nombre, descripción, prioridad, estado, fecha de expiración, acciones.
+
+**La tabla deberá cumplir los siguientes requisitos funcionales:**
+
+- Se deberá mostrar una fila con la información anteriormente mencionada de cada una de las tareas que han sido creadas en el controlador.
+- La celda que muestra la **prioridad** de cada una de las tareas deberá tener un fondo, aplicando para ello una clase concreta, según su valor:
+    - Si la prioridad es Baja → class=”table-success”
+    - Si la prioridad es Media → class=”table-warning”
+    - Si la prioridad es Alta → class=”table-danger”
+- La celda que muestra el **estado** de cada una de las tareas deberá tener un fondo, aplicando para ello una clase concreta, según su valor:
+    - Si el estado es Completada→ class=”table-success”
+    - Si el estado es En progreso→ class=”table-warning”
+    - Si el estado es Pendiente→ class=”table-danger”
+- Añade en las siguientes columnas los iconos para poder cambiar el estado y prioridad de las tareas:
+    - **Columna prioridad:**
+        - bi bi-arrow-up-circle-fill → solo se mostrará si la prioridad de una tarea es “Baja” o “Media” y la tarea no ha sido completada.
+        - bi bi-arrow-down-circle-fill → solo se mostrará si el estado de una tarea es “Alta” o “Media” y la tarea no ha sido completada.
+    - **Columna estado:**
+        - bi bi-play-fill → solo se mostrará si el estado de la tarea es “Pendiente”
+        - bi bi-check-lg → solo se mostrará si el estado de la tarea es “En proceso”
+        - bi bi-arrow-return-right → solo se mostrará si el estado de la tarea es “Completada”
+- En la columna **Acciones** se deberá mostrar los siguientes iconos:
+    - bi bi-pencil-square
+    - bi bi-trash
+
+A continuación se muestra un ejemplo del resultado final de la tabla mostrada por el componente:
+
+![TaskList Component](https://raw.githubusercontent.com/josearodriguezdaw/angular-tutorial/refs/heads/main/readme-images/tasklist-component.png)
+
+# 9. Event Binding.
 
 Angular permite enlazar eventos del DOM a métodos o funciones del componentes. Para enlazar eventos se usa la sintaxis `(evento)=”accion()”` en la etiqueta del elemento en cuestión al que queremos enlazar dicho evento.
 
@@ -308,7 +554,7 @@ Angular permite enlazar eventos del DOM a métodos o funciones del componentes. 
     - `input`: Se dispara cuando el valor de un elemento de entrada se modifica (incluye el evento `keyup`).
 - accion() → método del controlador que se ejecutará cuando se capture el evento.
 
-## Ejemplo de cómo capturar un evento click:
+## 9.1. Ejemplo de cómo capturar un evento click:
 
 ```tsx
 // app.component.ts
@@ -336,7 +582,7 @@ export class AppComponent {
 
 Cuando el usuario hace clic en el botón, el método mostrarMensaje() se ejecuta y cambia el valor de mensaje, que luego se muestra en la vista.
 
-## Ejemplo de cómo capturar un evento de teclado keyup:
+## 9.2. Ejemplo de cómo capturar un evento de teclado keyup:
 
 ```tsx
 // app.component.ts
@@ -363,7 +609,7 @@ export class AppComponent {
 <p>{{ mensaje }}</p>
 ```
 
-## Obtener el elemento que ha desencadenado el evento.
+## 9.3. Obtener el elemento que ha desencadenado el evento.
 
 En Angular, puedes capturar el elemento que ha desencadenado un evento pasándole el objeto $event al método del componente. Este objeto $event contiene información detallada sobre el evento, incluido el elemento DOM que fue clicado.
 
@@ -393,7 +639,7 @@ Tu objetivo es desarrollar un componente en Angular que funcione como un contado
     - Cuando el usuario haga clic en el botón de "Incrementar", el número mostrado debe aumentar en 1.
     - Cuando el usuario haga clic en el botón de "Decrementar", el número mostrado debe disminuir en 1.
 
-# 8. Property Binding.
+# 10. Property Binding.
 
 El property binding o enlace de propiedades es una técnica que nos permitirá enlazar las propiedades del controlador con las propiedades del DOM. Esto significa que podremos vinucar datos del controlador a las propiedades de un elemento HTML, lo que permite que el DOM se actualice cuando se actualice automáticamente los datos del controlador.
 
@@ -460,7 +706,7 @@ Otro de los aspectos interesantes es que se puede agregar o quitar clases CSS de
 <div class="active">
 ```
 
-### Beneficios del Property Binding
+### 10.1. Beneficios del Property Binding
 
 - **Actualización Automática**: Cualquier cambio en la propiedad del componente se refleja automáticamente en la vista, lo que simplifica la gestión del estado.
 - **Interactividad**: Permite crear interfaces de usuario interactivas que responden a los cambios en los datos.
