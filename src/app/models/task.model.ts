@@ -1,6 +1,6 @@
 export enum TaskStatus{
     Completada="C",
-    EnProgreso="EP",
+    EnProceso="EP",
     Pendiente="P"
 }
 
