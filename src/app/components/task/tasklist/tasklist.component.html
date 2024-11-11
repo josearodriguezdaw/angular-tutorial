@@ -20,16 +20,34 @@
             <tr  *ngFor="let task of listaTareas">
                 <td >{{task.nombre}}</td>
                 <td>{{task.descripcion}}</td>
-                <td [ngClass]="{'table-danger': task.prioridad=='A','table-success':task.prioridad=='B','table-warning':task.prioridad=='M'}">{{task.getTextoPrioridad()}}</td>
-                <td [ngClass]="{'table-danger': task.estado=='P','table-success':task.estado=='C','table-warning':task.estado=='EP'}">{{task.getTextoEstado()}}</td>
+                <td [ngClass]="{'table-danger': task.prioridad=='A','table-success':task.prioridad=='B','table-warning':task.prioridad=='M'}">
+                  <span *ngIf="(task.prioridad=='B' || task.prioridad=='M') && task.estado != 'C'" >&nbsp;</span>
+                  <i *ngIf="(task.prioridad=='B' || task.prioridad=='M') && task.estado != 'C'"  class="bi bi-arrow-up-circle-fill"></i>
+                  
+                  <span *ngIf="(task.prioridad=='A' || task.prioridad=='M') && task.estado != 'C'" >&nbsp;</span>
+                  <i *ngIf="(task.prioridad=='A' || task.prioridad=='M') && task.estado != 'C'" class="bi bi-arrow-down-circle-fill"></i>
+                  
+                  {{task.getTextoPrioridad()}}</td>
+                <td [ngClass]="{'table-danger': task.estado=='P','table-success':task.estado=='C','table-warning':task.estado=='EP'}">
+                  <span *ngIf="task.estado=='P'">&nbsp;</span>
+                  <i [ngClass]="{'bi bi-play-fill': task.estado=='P'}"></i>
+                 
+                  <span *ngIf="task.estado=='EP'">&nbsp;</span>
+                  <i [ngClass]="{'bi bi-check-lg': task.estado=='EP'}"></i>
+
+                  <span *ngIf="task.estado=='C'">&nbsp;</span>
+                  <i [ngClass]="{'bi bi-arrow-return-right': task.estado=='C'}"></i>
+
+                  
+                  {{task.getTextoEstado()}}</td>
                 <td>{{task.fechaExpiracion}}</td>
                 <td>
-                    <span>&nbsp;</span>
-                    <i *ngIf="task.prioridad=='B' || task.prioridad=='M'" class="bi bi-arrow-up-circle-fill"></i>
-                    <span>&nbsp;</span>
-                    <i *ngIf="task.prioridad=='A' || task.prioridad=='M'" class="bi bi-arrow-down-circle-fill"></i>
+                  
+                
+                   
                     <span>&nbsp;</span>
                     <i class="bi bi-pencil-square"></i>
+                   
                     <span>&nbsp;</span>
                     <i class="bi bi-trash"></i>
                 </td>
