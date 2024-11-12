@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Task, TaskPriority, TaskStatus } from '../../../models/task.model';
 import { CommonModule } from '@angular/common';
+import { take } from 'rxjs';
 
 @Component({
   selector: 'app-tasklist',
@@ -20,5 +21,31 @@ export class TasklistComponent implements OnInit{
     let task5:Task = new Task (5,"Tarea 5", "Descripción Tarea 5",TaskPriority.MEDIUM,TaskStatus.PENDING,new Date("11/10/2024"),new Date("11/30/2024"),false);
     this.taskList = [task1,task2,task3,task4,task5];
   }
+  getTask(taskId:number):Task[]{
+    return this.taskList.filter((tarea:Task)=>{
+      return tarea.id == taskId;
+    });
+  }
 
+  raiseTaskPriority(taskId:number){
+    let tarea:Task = this.getTask(taskId)[0];
+    tarea.raisePriority();
+  }
+
+  lowerTaskPriority(taskId:number){
+    let tarea:Task = this.getTask(taskId)[0];
+    tarea.lowerPriority();
+  }
+  changeTaskStatus(taskId:number){
+    let tarea:Task = this.getTask(taskId)[0];
+    tarea.changeStatus();
+  }
+  editTask(taskId:number){
+   console.log(`Editing Task with identify ${taskId}`);
+  }
+  deleteTask(taskId:number){
+    this.taskList = this.taskList.filter((tarea:Task)=>{
+      return tarea.id != taskId;
+    });
+  }
 }
