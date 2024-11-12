@@ -38,6 +38,10 @@ jobs:
       - name: Build app bundle
         run: npm run build:prod
 
+      # Route file renaming
+      - name: Rename index for routing
+        run: mv dist/angular-tutorial/index.csr.html dist/angular-tutorial/index.html
+        
       # Deploy GitHub pages
       - name: Deploy GitHub pages
         uses: crazy-max/ghaction-github-pages@v4.1.0
