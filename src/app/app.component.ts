@@ -8,7 +8,7 @@ import { BrowserModule } from '@angular/platform-browser';
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet,NavbarComponent,FooterComponent,TasklistComponent],
+  imports: [RouterOutlet,NavbarComponent,FooterComponent,TasklistComponent,RouterOutlet],
   templateUrl: './app.component.html',
   styleUrl: './app.component.css'
 })
