@@ -641,6 +641,34 @@ Tu objetivo es desarrollar un componente en Angular que funcione como un contado
     - Cuando el usuario haga clic en el botón de "Incrementar", el número mostrado debe aumentar en 1.
     - Cuando el usuario haga clic en el botón de "Decrementar", el número mostrado debe disminuir en 1.
 
+### Ejercicio:
+
+Tu objetivo es desarrollar un componente en Angular que funcione como un contador. Este componente debe hacer lo siguiente:
+
+1. **Mostrar un Texto**: Debe mostrar un número en la pantalla, que inicialmente será 0.
+2. **Incluir Dos Botones**:
+    - Un botón que incremente el número en 1 cada vez que se haga clic en él.
+    - Un botón que decrete el número en 1 cada vez que se haga clic en él.
+3. **Comportamiento Esperado**:
+    - Cuando el usuario haga clic en el botón de "Incrementar", el número mostrado debe aumentar en 1.
+    - Cuando el usuario haga clic en el botón de "Decrementar", el número mostrado debe disminuir en 1.
+
+## Ejercicio 4. Funcionalidad iconos tasklist.
+
+Implementa las siguientes funcionalidad a los iconos añadidos en la tabla del componente `tasklist` :
+
+- **Columna prioridad:**
+    - bi bi-arrow-up-circle-fill → subirá la prioridad de la tarea seleccionada. Si la tarea tiene una prioridad baja pasará a ser media y si es media pasará a ser alta.
+    - bi bi-arrow-down-circle-fill → bajará la prioridad de la tarea seleccionada. Si la tarea tiene una prioridad alta pasará a ser media y si es media pasará a ser baja.
+- **Columna estado:**
+    - bi bi-play-fill → cambiará el estado de la tarea seleccionada a “En Progreso”.
+    - bi bi-check-lg → solo se mostrará si el estado de la tarea es “En proceso”
+    - bi bi-arrow-return-right → solo se mostrará si el estado de la tarea es “Completada”
+- En la columna **Acciones** se deberá mostrar los siguientes iconos:
+    - bi bi-pencil-square → implementa un método que muestre por consola “Editando Tarea”. Esta funcionalidad será implementada más adelante.
+    - bi bi-trash → borra la tarea seleccionada.
+
+
 # 10. Property Binding.
 
 El property binding o enlace de propiedades es una técnica que nos permitirá enlazar las propiedades del controlador con las propiedades del DOM. Esto significa que podremos vinucar datos del controlador a las propiedades de un elemento HTML, lo que permite que el DOM se actualice cuando se actualice automáticamente los datos del controlador.
@@ -733,3 +761,188 @@ Tu objetivo es desarrollar un componente en Angular que muestre una imagen aleat
     - Cambia la propiedad `src` del elemento `<img>` con la nueva URL para mostrar la imagen.
 4. **Objetivo Final**:
     - Al hacer clic en el botón, la imagen mostrada debe cambiar a una nueva imagen aleatoria.
+
+# 11. Comunicación entre componentes.
+
+## 11.1. Comunicación entre componentes: padre a hijo.
+
+Para pasar datos de un componente padre a un componente hijo se usa el decorador `@Input()` dentro de la clase hijo, concretamente, en una de sus propiedades. Por ejemplo, supongamos que tenemos un componentes NavBar que recibe como dato de entrada un listado de los diferentes elementos que tendrá.
+
+En el componente hijo NavBar tendremos la siguiente propiedad:
+
+```tsx
+//navbar.component.ts
+ @Input()
+  listaOpciones:string[]=[];
+```
+
+Para poder pasarle desde el componente padre el listado de opciones tendremos que añadir a la etiqueta del componente hijo lo siguiente:
+
+```html
+<!--app.component.html-->
+<app-navbar [listaOpciones]="opciones"></app-navbar>
+```
+
+Mediante property binding estamos mapeando la propiedad listaOpciones del hijo con la propiedad opciones del padre. Si nos fijamos en la clase padre, esta deberá contar con una propiedad llamada opciones.
+
+```tsx
+//app.component.ts
+export class AppComponent {
+  opciones=["Inicio","Perfil","Acerca de"]
+}
+```
+
+Si en el template del componente hijo usamos @for para mostrar todos los elementos recibidos del padre de la siguiente forma:
+
+```html
+   <!--navbar.component.html-->
+    @for (opcion of listaOpciones; track opcion){
+        <p>{{opcion}}</p>
+    }
+```
+
+## 11.2. Comunicación entre componentes: hijo a padre.
+
+Para enviar datos desde un componente hijo a su padre usaremos el decorador `@Output()` junto con `EventEmiiter`.
+
+Siguiendo con el ejemplo anterior, supongamos que queremos enviarle al componente padre la opción del menú en la que hacen clic nuestros usuarios. Para ello, primeramente capturaremos dicho click en las opciones añadiendo la captura del evento en el HTML.
+
+```html
+<!--navbar.component.html-->
+    @for (opcion of listaOpciones; track opcion){
+        <p (click)="opcionClick($event)">{{opcion}}</p>
+    }
+```
+
+En la clase del componente hijo tendremos lo siguiente:
+
+```tsx
+//navbar.component.ts
+export class NavbarComponent {
+
+  @Input() listaOpciones:string[]=[];
+  
+  // Inicializamos el evento que le enviaremos al componente padre.
+  @Output() opcionSeleccionada = new EventEmitter<string>();  // Evento de salida
+
+	// Implementamos el método que se lanzará cuando se capture el clic en algunas de las opciones
+  opcionClick(event:Event): void {
+  
+    //Obtenemos el elemento sobre el que se ha hecho clic.
+    let elemento = event.target as HTMLElement;
+    
+    // Le enviamos un evento al padre con el texto del menú sobre el que se ha hecho click.
+    this.opcionSeleccionada.emit(elemento.innerText);
+  }
+}
+```
+
+Una vez que se ha emitido el evento al componente padre es necesario capturarlo y definir qué función se ejecutará. Para capturar dicho evento usaremos lo visto en el apartado Event Binding. Concretamente, añadiremos lo siguiente en el template del componente padre:
+
+```html
+<!--app.component.html-->
+<app-navbar [listaOpciones]="opciones" (opcionSeleccionada)="muestraOpcionSeleccionada($event)"></app-navbar>
+
+```
+
+- `(opcionSeleccionada)="muestraOpcionSeleccionada($event)"` → En este fragmento de código se captura el evento del hijo y se llama al método `muestraOpcionSeleccionada` que está definido en la clase padre, pasándole el mensaje del evento que ha ocurrido, que en este caso es un string.
+
+En la clase padre se ha implementado la lógica del método anterior:
+
+```tsx
+// app.component.ts
+export class AppComponent {
+  opciones=["Inicio","Perfil","Acerca de"];
+  opcionSeleccionada="";
+  
+  muestraOpcionSeleccionada(opcion:string):void{
+    this.opcionSeleccionada=opcion;
+  }
+}
+```
+
+Por último, para poder visualizar la opción seleccionada, se ha modificado la plantilla del componente padre y se ha añadido la siguiente línea:
+
+```html
+<!--app.component.html-->
+<p>{{opcionSeleccionada}}</p>
+```
+
+
+### EJERCICIO 5: Comunicación entre componentes.
+
+El objetivo de esta tarea consiste en extraer del componente TaskListComponente toda la funcionalidad relacionada con mostrar información de una tarea en concreto, así como las acciones que se pueden realizar sobre dicha tarea. El objetivo de extraer al componente TaskResume esta funcionalidad es poder reutilizarla en la pestaña de Inicio. 
+
+A continuación se muestra cómo se deberán organizar los diferentes componentes:
+
+![Task List Structure](https://raw.githubusercontent.com/josearodriguezdaw/angular-tutorial/refs/heads/main/readme-images/tasklist-structure.png)
+
+**Requisitos funcionales:**
+
+- Componente TaskListComponente:
+    - Debe tener un listado de tareas en en controlador.
+    - Debe mostrar en la plantilla un componente hijo TaskResume por cada una de las tareas del arreglo.
+    - Debe implementar los mecanismos de comunicación necesarios para actualizar la lista de Tareas cuando se realice alguna acción en el componente hijo TaskResume.
+- Componente TaskResume:
+    - Debe implementar los mecanismos de comunicación necesarios para que reciba un objeto tarea del componente padre y muestre la información de dicho objeto en la plantilla.
+    - Debe implementar los mecanismos de comunicación
+
+# 12. Formularios basados en plantillas.
+
+Los formularios basados en plantillas o Template-driven Forms son una manera declarativa de crear formularios HTML vinculados a los datos (data binding). Son declarativos porque la mayoría de la lógica del formulario se configura directamente en la plantilla HTML.
+
+Este enfoque se suele emplear en formularios sencillos donde no es necesario implementar mucha lógica en el controlador.
+
+Para poder hacer uso de este tipo de formularios es necesario importar el módulo `FormsModule` en el controlador del componente donde será implementado.
+
+```tsx
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet,FormsModule],
+  templateUrl: './app.component.html',
+  styleUrl: './app.component.css',
+})
+```
+
+El objetivo de este tipo de formularios es crear un enlace bidireccional entre las propiedades del controlador y los campos del formulario, de tal forma que cuando se modifique un dato en el formulario se actualice el valor en el controlador y viceversa. Para pode realizar dicho enlace se usará la directiva `[(ngModel)]` . Un ejemplo básico sería el siguiente:
+
+Vamos a crear en el controlador un objeto usuario con tres propiedades:
+
+```tsx
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+
+@Component({
+  selector: 'app-form',
+  standalone: true,
+  imports: [FormsModule],
+  templateUrl: './form.component.html',
+  styleUrl: './form.component.css'
+})
+export class FormComponent {
+
+  usuario = {
+    nombre : '',
+    apellidos: '',
+    edad: ''
+  }
+}
+```
+
+En la plantilla vamos un formulario con tres campos, dos de texto y uno numérico y los vamos a enlazar de manera bidireccional con las propiedades del controlador usando la directiva `[(ngModel)]` . Además, añadiremos la interpolación de las propiedades del controlador para ver cómo cambian.
+
+```html
+<form>
+    <input type="text" [(ngModel)]="usuario.nombre" name="nombre" placeholder="Indique el nombre del usuario"/>
+    <input type="text" [(ngModel)]="usuario.apellidos" name="apellidos" placeholder="Indique los apellidos del usuario"/>
+    <input type="number" [(ngModel)]="usuario.edad" name="edad" placeholder="Indique la edad del usuario"/>
+    <input type="submit" >
+</form>
+
+<p>{{usuario.nombre}}</p>
+<p>{{usuario.apellidos}}</p>
+<p>{{usuario.edad}}</p>
+```
+
+Si implementamos dicho código podemos observar cómo cuando cambiamos el valor de los inputs se actualiza el valor del controlador y se muestra por pantalla el valor actualizado.
