@@ -675,6 +675,10 @@ El property binding o enlace de propiedades es una técnica que nos permitirá e
 
 El property binding se utiliza en la plantilla HTML empleando la sintaxis de corchetes `[]` . La expresión dentro del corchete se evalúa y el valor resultante se asigna a la propiedad del elemento del DOM correspondiente.
 
+![Property Binding Scheme](https://raw.githubusercontent.com/josearodriguezdaw/angular-tutorial/refs/heads/main/readme-images/property-binding.png)
+
+Fuente: [https://zainulebadd.medium.com/property-binding-in-angular-explained-6eebf850e1be](https://zainulebadd.medium.com/property-binding-in-angular-explained-6eebf850e1be)
+
 A continuación se muestra un ejemplo de cómo usar property binding en Angular.
 
 ```tsx
@@ -946,3 +950,290 @@ En la plantilla vamos un formulario con tres campos, dos de texto y uno numéric
 ```
 
 Si implementamos dicho código podemos observar cómo cuando cambiamos el valor de los inputs se actualiza el valor del controlador y se muestra por pantalla el valor actualizado.
+
+
+# 13. Formularios reactivos.
+
+Los formularios reactivos o Reactive Forms nos permitirán crear formularios dinámicos y complejos utilizando el enfoque de la programación reactiva, la cual se basa en gestionar estos formularios desde el controlador donde se declarará el modelo del formulario como un grupo de controles. 
+
+Este tipo de formularios es ideal cuando se quiere un mayor control sobre la lógica del formulario, las validaciones y los datos.
+
+Para poder implementar los formularios reactivos en nuestra aplicación deberemos importar el siguiente módulo: `ReactiveFormsModule` .
+
+## 13.1 Configuración de la clase del componente.
+
+Para poder implementar un formulario reactivo debemos crear en el controlador un objeto del tipo `FormGroup` que será el que represente a nuestro formulario e implementar el constructor para que reciba un objeto `FormBuilder` :
+
+```tsx
+import { Component } from '@angular/core';
+import { FormBuilder, FormGroup, FormsModule, ReactiveFormsModule, Validators } from '@angular/forms';
+
+@Component({
+  selector: 'app-form',
+  standalone: true,
+  imports: [FormsModule, ReactiveFormsModule],
+  templateUrl: './form.component.html',
+  styleUrl: './form.component.css'
+})
+export class FormComponent {
+
+  registroForm:FormGroup;
+
+ constructor (formBuilder:FormBuilder){
+  this.registroForm = formBuilder.group({
+    'nombre': ['', [Validators.required, Validators.minLength(10)]],
+    'edad': ['', [Validators.required, Validators.min(1),Validators.max(110)]],
+    'mail': ['', [Validators.required, Validators.email]],
+  });
+ }
+  onSubmit() {
+    if (this.registroForm.valid) {
+      console.log('Formulario enviado:', this.registroForm.value);
+      console.log("Nombre:" + this.registroForm.get("nombre")?.value);
+      console.log("Nombre válido?:" + this.registroForm.get("nombre")?.valid);
+    } else {
+      console.log('Formulario no válido');
+    }
+  }
+}
+
+```
+
+Si nos paramos a analizar el código anterior, lo que hemos hecho ha sido llamar al método `group`del objeto `FormBuilder` del constructor (este objeto nos lo pasará la plantilla), y le hemos pasado un objeto literal que contiene como atributos los nombres de los campos que vamos a definir en el formulario de la plantilla y como valores se le ha pasado un arreglo donde el primer elemento representa el valor inicial del campo y el segundo elemento es un arreglo que contiene las validaciones que se aplicarán a dicho campo. 
+
+Algunas de las validaciones que nos proporciona la clase `Validatos` son:
+
+- **`required`**: Campos obligatorios.
+- **`min` y `max`**: Validar rango numérico.
+- **`minLength` y `maxLength`**: Limitar el número de caracteres.
+- **`email`**: Validar formato de email.
+- **`pattern`**: Validar expresiones regulares personalizadas.
+- **`compose` y `composeAsync`**: Combinar validaciones.
+
+Por último, hemos implementado una función `submit()` que será llamada cuando el usuario haga clic en el botón “Enviar” de nuestro formulario. Esta función comprobará si los campos cumplen con las validaciones establecidas empleando la sintaxis:
+
+`this.registroForm.valid`
+
+Además, podemos acceder al valor de cada uno de los campos del formulario así como verificar si se cumplen todas las validaciones establecidas de la siguiente forma:
+
+```tsx
+      console.log("Nombre:" + this.registroForm.get("nombre")?.value);
+      console.log("Nombre válido?:" + this.registroForm.get("nombre")?.valid);
+```
+
+## 13.2. Configuración de la plantilla del componente.
+
+```html
+<h2>Formulario de Registro</h2>
+<form [formGroup]="registroForm" (ngSubmit)="onSubmit()">
+  <div>
+    <label for="nombre">Nombre:</label>
+    <input id="nombre" type="text" formControlName="nombre" />
+    @if(this.registroForm.get('nombre')?.errors?.['required']) {
+        <span>(El nombre no puede quedar vacío)</span>
+    }
+     @if(this.registroForm.get('nombre')?.errors) {
+        <span>(El nombre no es válido)</span>
+    }
+  </div>
+  <div>
+    <label for="edad">Edad:</label>
+    <input id="edad" type="number" formControlName="edad" />
+    @if(this.registroForm.get('edad')?.errors?.['required']) {
+        <span>(La edad no puede quedar vacío)</span>
+    }
+     @if(this.registroForm.get('nombre')?.errors) {
+        <span>(La edad no es válida)</span>
+    }
+  </div>
+
+  <div>
+    <label for="mail">Email:</label>
+    <input type="mail" id="mail" formControlName="mail" />
+    @if(this.registroForm.get('mail')?.errors?.['required']) {
+        <span>(El email no puede quedar vacío)</span>
+    }
+     @if(this.registroForm.get('mail')?.errors) {
+        <span>(El email no es válido)</span>
+    }
+  </div>
+
+  <button type="submit" [disabled]="registroForm.invalid">Registrarse</button>
+</form>
+```
+
+En la plantilla hemos realizado las siguientes configuraciones:
+
+- La directiva `[formGroup]` conecta el formulario HTML con el `FormGroup` definido en el controlador.
+- Cada campo usa `formControlName` para vincularse a su respectivo `FormControl` en `registroForm`.
+- Mediante la sintaxis `@if` hemos mostrado mensajes de errores específicos y genéricos basados en el estado de cada `FormControl`.
+
+## 13.3. Validaciones personalizadas a campos individuales:
+
+Como hemos estudiado en los apartados anteriores, podemos validar los campos de un formulario usando las validaciones proporcionadas por la clase `Validators` , pero además, también podemos realizar la implementación de validaciones personalizadas, cómo, por ejemplo, una validación para verificar que el DNI de un usuario cumple con el formato y letra correcta.
+
+Para poder implementar una nueva validación es necesario implementar una función que un objeto con errores o `null` si la validación es exitosa. Dicha función la implementaremos en un archivo diferente llamada `login.validator.ts` La estructura que debe tener la función de validación es la siguiente
+
+```tsx
+//login.validator.ts
+import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+
+//Ejemplo estructura función
+export function customValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    let valorCampo = control.value
+    const isValid = true /* condición para validar el valor */;
+    return isValid ? null : { customErrorKey: true }; // Error si no es válido
+  };
+}
+/**
+* Función que verifica que una contraseña tenga un número, un caracter especial, una letra mayúscula y más de 8 caracteres
+*/
+export function passwordValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const password = control.value || '';
+    const hasNumber = /\d/.test(password); // Verifica que contenga al menos un número
+    const hasUppercase = /[A-Z]/.test(password); // Verifica que contenga al menos una mayúscula
+    const hasSpecialCharacter = /[!@#$%^&*(),.?":{}|<>]/.test(password); // Caracteres especiales
+    const hasMinLength = password.length > 8; // Verifica que tenga más de 8 caracteres
+
+    // Comprobamos si todos los criterios son válidos
+    const isValid = hasNumber && hasUppercase && hasSpecialCharacter && hasMinLength;
+    return isValid ? null : { invalidPassWord: true }; // Error si no es válida
+  };
+}
+```
+
+La función de validación anterior recibirá un parámetro `control` de tipo `AbstractControl` que representa al formulario reactivo dónde estamos usando dicha validación. Dentro de dicha función se obtendrá el valor del campo mediante un `contro.value` y se realizarán las comprobaciones necesarias. Si la validación es correcta, es decir, no hay errores, se devolverá null, de lo contrario, se devolverá un objeto con los errores producidos. Dicho objeto tendrá la siguiente estructura: `{nombreError1:true, nombreError2:true}` 
+
+Para poder usar dichas validaciones personalizadas en el controlador, tendremos que modificar la definición de nuestro FormGroup:
+
+```tsx
+constructor(private fb: FormBuilder) {
+this.myForm = this.fb.group({
+  'username': ['', [Validators.required]], // Aplica la validación personalizada
+  'email': ['', [Validators.required, Validators.email]],
+  **'password':['', [**Validators.required,**passwordValidator()]],
+  'confirmPassword':['', [**Validators.required**]],**
+});
+}
+```
+
+Estos errores pueden ser capturados posteriormente desde el formulario:
+
+```tsx
+registroForm.get('password')?.hasError('invalidPassWord')
+registroForm.get('password')?.errors?.['invalidPassWord']
+```
+
+## 13.4. Validaciones personalizadas a un grupo de campos:
+
+En el punto anterior hemos visto cómo aplicarle una validación personalizada a un campo concreto, pero, también puede darse el caso de querer aplicar una validación a dos campos al mismo tiempo, por ejemplo a dos campos llamados `password` y `confirmpassword`. Lo interesante sería aplicar una validación personalizada para validar que ambos campos contienen la misma contraseña. Para realizar esto, será necesario configurar una validación personalizada a nivel de grupo.
+
+Lo primero que haremos será definir nuestra validación personalizada:
+
+```tsx
+export function passwordsMatchValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const password = control.get('password')?.value;
+    const confirmPassword = control.get('confirmPassword')?.value;
+    return password === confirmPassword ? null : { passwordsMismatch: true };
+  };
+}
+```
+
+En el controlador sería necesario añadir a la definición de nuestro FormGroup una nueva clave llamada `validators`:
+
+```tsx
+constructor(private fb: FormBuilder) {
+  this.myForm = this.fb.group({
+    'username': ['', [Validators.required]], // Aplica la validación personalizada
+    'email': ['', [Validators.required, Validators.email]],
+    'password':['', [Validators.required,passwordValidator()]],
+    'confirmPassword':['', [Validators.required]],
+  },
+  **{
+  validators:passwordsMatchValidator()**
+  });
+}
+```
+
+## 13.5. Validaciones desde el controlador:
+
+Otra forma que tenemos para poder validar un formulario es suscribiéndonos a los cambios que se produzcan en cada uno de los campos y validando dichos cambios desde el controlador, tal y como se muestra a continuación:
+
+ this.passwordForm.get('password')?.valueChanges.subscribe(() => {
+  const confirmPasswordControl = this.passwordForm.get('confirmPassword');
+  if (confirmPasswordControl?.value !== this.passwordForm.get('password')?.value) {
+    confirmPasswordControl?.setErrors({ passwordsMismatch: true });
+  } else {
+    confirmPasswordControl?.setErrors(null);
+}
+
+## 11.6. Visualización de validaciones con Bootstrap en la plantilla.
+
+Una vez que hemos realizado las validaciones en el controlador, vamos a ver cómo configurar la plantilla de nuestro proyecto para que tenga un estilo visual parecido al de la siguiente imagen:
+
+![Bootstrap Form Validators](https://raw.githubusercontent.com/josearodriguezdaw/angular-tutorial/refs/heads/main/readme-images/bootstrap-form.png)
+
+Para lograr esto, debemos controlar lo siguiente:
+
+- Se le deberá añadir a los campos de entradas las clases `is-valid` o `is-invalid` para que muestren el tick verde [**✅**](https://emojipedia.org/es/bot%C3%B3n-de-marca-de-verificaci%C3%B3n) o en rojos con el símbolo de exclamación **❗**.
+    - Para lograr esto, usaremos la directiva vista en el apartado anterior `[ngClass]` . Por ejemplo:
+    
+    ```html
+    <input type="text" class="form-control" id="username" 
+    [ngClass]="{'is-valid': loginForm.get('username')?.valid}">
+    
+    ```
+    
+- Para mostrar los textos con la información sobre los errores debajo de cada campo usaremos un divisor que tendrá la clase `valid-feedback` o `invalid-feedback` para mostrar el texto en color verde o rojo, respectivamente. Dentro de este divisor usaremos la etiqueta <small> para mostrar los errores específicos:
+
+```html
+ <div class="invalid-feedback">
+   <small> Please choose a username.<small>
+ </div>
+```
+
+- Será necesario implementar en nuestra plantilla toda la lógica para poder controlar qué mensaje de error se mostrará en cada momento. Para ello, usaremos la directiva *ngIf para mostrar un mensaje de error concreto:
+
+```tsx
+ <small *ngIf="loginForm.get('username')?.errors?.['required']"> Please choose a username.</small>
+ <small *ngIf="loginForm.get('username')?.errors?.['validUsername']"> This user is in use </small>
+ 
+ <small *ngIf="loginForm.get('username')?.hasError('required')"> Please choose a username.</small>
+ <small *ngIf="loginForm.get('username')?.hasError('validUsername')"> This user is in use </small>
+```
+
+- Podemos aplicar a las directivas anteriores una nueva condición para controlar que únicamente se muestren los errores si el usuario ha interactuado con el campo. De esta forma evitaremos que por defecto en el formulario aparezcan todos los errores. Para ello, será necesario añadir la siguiente conción: `loginForm.get('username')?.touched`
+
+### EJERCICIO 6 : Creación y edición de tareas
+
+El objetivo del presente ejercicio es añadir un formulario reactivo que nos permita crear nuevas tareas. La implementación de este formulario se realizará en el componente `TaskForm` que deberá ser mostrado en el componente padre `TaskList`. A continuación se definen los diferentes requisitos funcionales:
+
+**Requisitos del componente hijo `TaskForm`:**
+
+- Deberá mostrar un formulario reactivo usando Bootstrap que contenga los siguientes campos y Validaciones:
+    - Nombre: input de tipo texto dónde el usuario indicará el nombre de la tarea. Validaciones:
+        - Requerido y su longitud no puede ser superior a 50 caracteres.
+    - Descripción: input de tipo textarea dónde el usuario indicará la descripción de la tarea. Validaciones:
+        - Su longitud no puede ser superior a 250 caracteres.
+    - Prioridad: desplegable dónde se mostrarán las posibles prioridad que tendrá la tarea. Validaciones:
+        - Requerido y su valor debe ser L, M o H.
+    - Fecha de expiración: input de tipo datetime-local dónde se indicará la fecha de expiración de la tarea. Validaciones:
+        - Requerido y la fecha debe ser posterior al día de creación de la tarea.
+- Deberá mostrar en la plantilla, de manera adecuada, los errores de validaciones producidos.
+- Cuando el usuario haga clic en el botón “Editar Tarea” se deberá llamar a la función`onSubmit()` para que cree un nuevo objeto Tarea con los campos introducidos en el formulario, si dicho formulario es válido, es decir, que no contiene errores de validación. Dicho objeto deberá ser enviado al componente padre para que lo añada al listado de Tareas, usando para ello la comunicación entre componentes vista en el punto anterior.
+    - Nota: para crear el identificador de la tarea puede genera un número aleatorio de gran tamaño.
+
+**Requisitos del componente padre `TaskList`:**
+
+- Deberá mostrar encima del listado de tareas un el componente hijo `TaskForm`.
+- Deberá capturar los eventos relativos a la creación o edición enviados por el componente hijo `TaskForm`, así como implementar la lógica asociada a dichas tareas.
+- Cuando un usuario haga clic en el botón Editar de una tarea, se le enviará al componente hijo `TaskForm` el objeto en cuestión para que cargue sus datos en el formulario de edición.
+
+# Bibliografía
+
+https://www.tutorialesprogramacionya.com/
+
+https://blog.enriqueoriol.com/
