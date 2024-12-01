@@ -1427,6 +1427,43 @@ Será necesario importar en el decorador de nuestro componente los módulos de r
 <!-- Aquí se renderizarán los componentes hijos -->
 <router-outlet></router-outlet>
 ```
+## 14.4. Redirección desde el controlador.
+
+Para poder realizar una redirección a una ruta específica desde el controlador de un componente es necesario usar el servicio Router, el cual, proporciona un conjunto de métodos para navegar entre rutas.
+
+Supongamos que tenemos un componente llamado LoginComponente que es el encargado de mostrar un formulario de inicio de sesión. En el caso de que el login del usuario sea correcto será necesario redirigir al usuario a la página principal. Para ello, realizaremos los siguientes pasos:
+
+1. **Inyectar el servicio Router en la clase/controlador del componente LoginComponent:**
+
+```
+export class LoginComponent {
+
+  **constructor(private routerService:Router){}**
+}
+
+```
+
+1. **Usar servicio Router:**
+
+```tsx
+export class LoginComponent {
+
+  constructor(private routerService:Router){}
+
+  login(){
+    //TODO: Comprobamos que el login es correcto
+
+    //Redirección sin parámetros
+    **this.routerService.navigate(['/home']);**
+  }
+```
+
+En el ejemplo anterior se realiza una redirección sin parámetros, pero también podría ser necesario redireccionar a una ruta usando algún parámetro. Para ello, debemos usar el servicio Router de la siguiente forma:
+
+```tsx
+this.router.navigate(['/taskform', taskId]);
+```
+
 
 ## EJERCICIO 7: Creación y configuración de rutas.
 
@@ -1466,7 +1503,7 @@ El objetivo del presente ejercicio es configurar las diferentes rutas de nuestra
 - Modifica las plantillas de los componentes anteriores para que muestren la siguiente información:
     - `LoginComponent` → Debe mostrar un formulario de Bootstrap que contenga un campo Usuario y un campo Contraseña de tipo password.
     - `SinginComponente` → Debe mostrar un formulario de Bootstrap que contenga los siguientes campos: Nombre, Apellidos, Email, Usuario, Contraseña, Confirma contraseña.
-    - `HomeComponente` → Debe mostrar los siguientes componentes en el siguiente orden: NavbarComponente, TasklistComponent, FooterComponent.
+    - `HomeComponente` → Debe mostrar los siguientes componentes en el siguiente orden: NavbarComponente, TaskResume, FooterComponent.
     - `TaskComponent` → Debe mostrar los siguientes componentes en el siguiente orden: NavbarComponente,TaskformComponent, TasklistComponent, FooterComponent.
     - `DasboardComponente` → Debe mostrar los siguientes componentes en el siguiente orden: NavbarComponente,<router-outlet>, FooterComponent.
     - `NotFoundComponent` → Debe mostrar un mensaje de texto indicando que la ruta indicada no es válida.
